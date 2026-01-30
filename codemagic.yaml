@@ -8,6 +8,11 @@ workflows:
       cancel_previous_builds: true
 
     scripts:
+      - name: Clone the repository
+        script: |
+          git clone https://github.com/jialezi/turnstile-solver.git
+          cd turnstile-solver
+
       - name: Install Python dependencies
         script: |
           python3 -m pip install --upgrade pip setuptools wheel
