@@ -1,19 +1,19 @@
 workflows:
   build-and-run:
     name: Vote Solver (Free macOS)
-    max_build_duration: 60           # keep short for free tier
+    max_build_duration: 60           # minutes – keep short on free tier
     triggering:
       events:
         - push
     scripts:
       - echo "🐳 Checking Docker: $(docker --version || echo 'Docker not found')"
-      - git clone https://github.com/RanjanLabz/vote-automation.git || echo "Clone failed - check repo access"
-      - ls -la vote-automation/ || echo "Clone dir missing?"
+      - git clone https://github.com/RanjanLabz/vote-automation.git || echo "Clone failed - check if repo is public/private correctly"
+      - ls -la vote-automation/ || echo "Clone directory not created?"
       - cd vote-automation || exit 1
-      - ls -la                     # show what's inside after cd
-      - test -f run_docker.sh && echo "✅ run_docker.sh found" || { echo "❌ MISSING run_docker.sh"; exit 1; }
+      - ls -la                     # debug: confirm run_docker.sh is visible
+      - test -f run_docker.sh && echo "✅ run_docker.sh found" || { echo "❌ run_docker.sh MISSING → check git add/commit/push"; exit 1; }
       - chmod +x run_docker.sh
-      - ./run_docker.sh || echo "run_docker.sh exited with code $?"
+      - ./run_docker.sh || echo "run_docker.sh finished with exit code $?"
     artifacts:
       - vote-automation/**/*
-      - "*.log"                    # optional: capture any logs your script creates
+      - "*.log"                    # capture any .log files your script might create
