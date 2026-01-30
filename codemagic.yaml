@@ -1,16 +1,16 @@
 workflows:
-  - name: macOS CI
+  macOS CI:
     max_build_duration: 60
     environment:
       os: macos-latest
       xcode: latest
     steps:
-      - name: Clone the repository
+      Clone the repository:
         script: |
           git clone https://github.com/jialezi/turnstile-solver.git
           cd turnstile-solver
 
-      - name: Install dependencies
+      Install dependencies:
         script: |
           # Ensure that Python 3 and pip are installed
           python3 -m venv venv
@@ -18,7 +18,7 @@ workflows:
           pip install --upgrade pip
           pip install quart playwright
 
-      - name: Install Chrome and dependencies on macOS
+      Install Chrome and dependencies on macOS:
         script: |
           # Install dependencies for Chrome
           brew install --cask google-chrome
@@ -26,11 +26,11 @@ workflows:
           pip install playwright
           python -m playwright install
 
-      - name: Start Turnstile Solver
+      Start Turnstile Solver:
         script: |
           # Run the Turnstile Solver script
           python app.py
 
-      - name: Run Tests (Optional)
+      Run Tests (Optional):
         script: |
           curl "http://127.0.0.1:5000/turnstile?url=https://example.com&sitekey=3x00000000000000000000FF"
