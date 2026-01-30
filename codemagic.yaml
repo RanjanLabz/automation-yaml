@@ -1,36 +1,33 @@
-workflows:
-  macOS CI:
-    max_build_duration: 60
-    environment:
-      os: macos-latest
-      xcode: latest
-    steps:
-      Clone the repository:
-        script: |
-          git clone https://github.com/jialezi/turnstile-solver.git
-          cd turnstile-solver
+jobs:
+  - macos_ci:
+      max_build_duration: 60
+      steps:
+        - name: Clone the repository
+          run: |
+            git clone https://github.com/jialezi/turnstile-solver.git
+            cd turnstile-solver
 
-      Install dependencies:
-        script: |
-          # Ensure that Python 3 and pip are installed
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install quart playwright
+        - name: Install dependencies
+          run: |
+            # Ensure that Python 3 and pip are installed
+            python3 -m venv venv
+            source venv/bin/activate
+            pip install --upgrade pip
+            pip install quart playwright
 
-      Install Chrome and dependencies on macOS:
-        script: |
-          # Install dependencies for Chrome
-          brew install --cask google-chrome
-          # Install necessary libraries for Playwright
-          pip install playwright
-          python -m playwright install
+        - name: Install Chrome and dependencies on macOS
+          run: |
+            # Install dependencies for Chrome
+            brew install --cask google-chrome
+            # Install necessary libraries for Playwright
+            pip install playwright
+            python -m playwright install
 
-      Start Turnstile Solver:
-        script: |
-          # Run the Turnstile Solver script
-          python app.py
+        - name: Start Turnstile Solver
+          run: |
+            # Run the Turnstile Solver script
+            python app.py
 
-      Run Tests (Optional):
-        script: |
-          curl "http://127.0.0.1:5000/turnstile?url=https://example.com&sitekey=3x00000000000000000000FF"
+        - name: Run Tests (Optional)
+          run: |
+            curl "http://127.0.0.1:5000/turnstile?url=https://example.com&sitekey=3x00000000000000000000FF"
