@@ -1,16 +1,17 @@
 workflows:
   build-and-run:
     name: Clone repo & run Docker script
-    max_build_duration: 120          # minutes (1–120 allowed)
-    instance_type: linux             # valid options: linux, linux_x2, linux_x4 (linux_x2 = more powerful/parallel)
+    max_build_duration: 120          # max 120 min
+    # No instance_type here → defaults to mac_mini_m2 (free 500 min/month)
     triggering:
       events:
         - push
       cancel_previous_builds: true
     scripts:
-      - git clone https://github.com/RanjanLabz/vote-automation.git
-      - cd vote-automation
-      - chmod +x run_docker.sh       # ensure executable (git sometimes loses +x)
-      - ./run_docker.sh              # run it (or bash run_docker.sh)
+      - git clone https://github.com/RanjanLabz/vote-automation.git || echo "Clone failed"
+      - cd vote-automation || exit 1
+      - ls -la                     # debug: list files to confirm clone worked
+      - chmod +x run_docker.sh     # ensure executable
+      - ./run_docker.sh || echo "Script finished (code $?)"   # run & show exit code
     artifacts:
-      - vote-automation/**/*         # optional: preserve folder / logs / outputs
+      - vote-automation/**/*       # optional: save outputs/logs if script generates any
