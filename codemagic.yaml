@@ -1,5 +1,6 @@
+version: 2  # Correct placement of the version field (this is the top-level version)
+
 workflows:
-  version: 2  # Use an integer version here (2 is correct)
   build:
     name: Build and Run Docker
     trigger:
