@@ -1,10 +1,8 @@
 workflows:
-  version: '2'  # Version should be a string
+  version: 2  # Use an integer version here (2 is correct)
   build:
     name: Build and Run Docker
     trigger:
-      # You can adjust the trigger to define when to start the build
-      # For example, on every commit to the 'main' branch
       branches:
         include:
           - main
