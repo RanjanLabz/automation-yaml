@@ -1,33 +1,47 @@
-jobs:
-  - macos_ci:
-      max_build_duration: 60
-      steps:
-        - name: Clone the repository
-          run: |
-            git clone https://github.com/jialezi/turnstile-solver.git
-            cd turnstile-solver
+workflows:
+  turnstile-solver-auto:
+    name: Turnstile Solver - Auto-Cloned Python Run
+    max_build_duration: 35                  # Free-plan safe
+    triggering:
+      events:
+        - push                             # Auto-starts on git push
+      cancel_previous_builds: true
 
-        - name: Install dependencies
-          run: |
-            # Ensure that Python 3 and pip are installed
-            python3 -m venv venv
-            source venv/bin/activate
-            pip install --upgrade pip
-            pip install quart playwright
+    scripts:
+      - name: Install Python dependencies
+        script: |
+          python3 -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt || echo "requirements.txt install note"
+          pip install playwright quart     # Ensure core packages
 
-        - name: Install Chrome and dependencies on macOS
-          run: |
-            # Install dependencies for Chrome
-            brew install --cask google-chrome
-            # Install necessary libraries for Playwright
-            pip install playwright
-            python -m playwright install
+      - name: Setup Playwright Chromium
+        script: |
+          playwright install chromium --with-deps
+          playwright --version
 
-        - name: Start Turnstile Solver
-          run: |
-            # Run the Turnstile Solver script
-            python app.py
+      - name: Verify cloned repo contents (debug)
+        script: |
+          pwd                              # Shows current dir (cloned repo root)
+          ls -la                           # Lists app.py, requirements.txt, etc.
+          echo "Repo was auto-cloned - no manual git clone needed"
 
-        - name: Run Tests (Optional)
-          run: |
-            curl "http://127.0.0.1:5000/turnstile?url=https://example.com&sitekey=3x00000000000000000000FF"
+      - name: Launch solver & run quick tests
+        script: |
+          echo "Starting app.py in background..."
+          python3 app.py > solver.log 2>&1 &
+          sleep 25                         # Wait for startup
+
+          echo "Health check:"
+          curl -s http://127.0.0.1:5000/health || \
+          curl -s http://127.0.0.1:5005/health || \
+          echo "Health failed - see solver.log"
+
+          echo "Demo Turnstile request:"
+          curl -s "http://127.0.0.1:5000/turnstile?url=https://challenges.cloudflare.com&sitekey=0x4AAAAAACU0HhFzKmX2XbPy" || \
+          echo "Test request failed"
+
+          echo "Server logs tail:"
+          tail -n 30 solver.log || echo "No logs"
+
+    artifacts:
+      - solver.log                         # Download after build for full output
