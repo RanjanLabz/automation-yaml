@@ -1,21 +1,19 @@
-version: 2.1
-
-jobs:
-  clone_and_run_docker:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - run:
-          name: Clone vote-automation repo and execute run_docker.sh
-          command: |
-            git clone https://github.com/RanjanLabz/vote-automation.git
-            cd vote-automation
-            # Make script executable in case git didn't preserve permissions
-            chmod +x run_docker.sh || true
-            bash run_docker.sh   # or ./run_docker.sh
-
 workflows:
-  build:
-    jobs:
-      - clone_and_run_docker
+  build-and-run:
+    name: Clone repo & run Docker script
+    max_build_duration: 120          # minutes
+    instance_type: linux_x86_64      # or linux_m2 if you need more power
+    triggering:
+      events:
+        - push
+      cancel_previous_builds: true
+    environment:
+      groups:
+        # add any env groups if needed (e.g. secrets)
+    scripts:
+      - git clone https://github.com/RanjanLabz/vote-automation.git
+      - cd vote-automation
+      - chmod +x run_docker.sh        # make sure it's executable
+      - ./run_docker.sh               # or bash run_docker.sh
+    artifacts:
+      - vote-automation/**/*          # optional: save files/logs if needed
