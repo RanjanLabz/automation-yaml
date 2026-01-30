@@ -3,25 +3,20 @@ version: 2.1
 jobs:
   clone_and_run_docker:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/base:stable     # or circleci/python:3.8 if you need Python pre-installed
+    resource_class: medium          # optional – adjust if needed
     steps:
       - checkout
       - run:
-          name: Clone vote-automation and run Docker
+          name: Clone repo + run script (in one step so cd works)
           command: |
             git clone https://github.com/RanjanLabz/vote-automation.git
             cd vote-automation
+            chmod +x run_docker.sh    # just in case
             bash run_docker.sh
-      - run:
-          name: Wait for solver (optional check)
-          command: |
-            sleep 10
-            curl -f http://localhost:5005/health || echo "No health endpoint"
 
 workflows:
-  build:
+  version: 2
+  build:                      # workflow name (can be anything)
     jobs:
-      - clone_and_run_docker:
-          post-steps:
-            - store_artifacts:
-                path: vote-automation
+      - clone_and_run_docker
