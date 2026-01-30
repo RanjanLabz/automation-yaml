@@ -7,14 +7,15 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Clone + cd + run script
+          name: Clone vote-automation repo and execute run_docker.sh
           command: |
             git clone https://github.com/RanjanLabz/vote-automation.git
             cd vote-automation
+            # Make script executable in case git didn't preserve permissions
             chmod +x run_docker.sh || true
-            ./run_docker.sh
+            bash run_docker.sh   # or ./run_docker.sh
 
 workflows:
-  build:                        # ← workflow name (no "version" here!)
+  build:
     jobs:
       - clone_and_run_docker
