@@ -1,18 +1,12 @@
-version: 2  # Correct placement of the version field (this is the top-level version)
+version: 2  # Correct version syntax
 
 workflows:
   build:
-    name: Build and Run Docker
-    trigger:
-      branches:
-        include:
-          - main
     jobs:
       - clone_and_run_docker
 
 jobs:
   clone_and_run_docker:
-    name: Clone Repo and Run Docker
     docker:
       - image: circleci/python:3.8  # Use an appropriate Docker image for your project
     steps:
