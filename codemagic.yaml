@@ -1,29 +1,27 @@
-version: 2  # Correct version syntax
-
-workflows:
-  build:
-    jobs:
-      - clone_and_run_docker
+version: 2.1
 
 jobs:
   clone_and_run_docker:
     docker:
-      - image: circleci/python:3.8  # Use an appropriate Docker image for your project
+      - image: cimg/base:stable
     steps:
-      # Step 1: Clone the repository
       - checkout
-
-      # Step 2: Clone the specific repository
       - run:
-          name: Clone vote-automation repo
-          command: git clone https://github.com/RanjanLabz/vote-automation.git
-
-      # Step 3: Change directory to the cloned repo
+          name: Clone vote-automation and run Docker
+          command: |
+            git clone https://github.com/RanjanLabz/vote-automation.git
+            cd vote-automation
+            bash run_docker.sh
       - run:
-          name: Change directory to vote-automation
-          command: cd vote-automation
+          name: Wait for solver (optional check)
+          command: |
+            sleep 10
+            curl -f http://localhost:5005/health || echo "No health endpoint"
 
-      # Step 4: Run the run_docker.sh script
-      - run:
-          name: Run Docker script
-          command: bash run_docker.sh
+workflows:
+  build:
+    jobs:
+      - clone_and_run_docker:
+          post-steps:
+            - store_artifacts:
+                path: vote-automation
